@@ -10,11 +10,4 @@ class Anime(BaseModel):
     rating: str
     synopsis: str
     genres: list
-
-class Episode(BaseModel):
-    id: int
-    title: str
-
-class EpisodeDetail(Episode):
-    duration: int
-    synopsis: str
+    images: dict
