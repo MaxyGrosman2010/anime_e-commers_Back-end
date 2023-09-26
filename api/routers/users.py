@@ -24,6 +24,21 @@ def search_user(field: str, key):
     try: return UserDB(**userdb_schema(db_client.users.find_one({field: key})))
     except: return "Not found"
 
+async def auth_user(token: str = Depends(oauth2)):
+    exception = HTTPException(status.HTTP_400_BAD_REQUEST, detail= "Invalid credentials")
+
+    try:
+        username = jwt.decode(token, SECRET, algorithms= ALGORITHM).get("sub")
+        if username is None: raise exception
+    except: raise exception
+
+    return search_user("username", username)
+
+async def current_user(user: UserDB = Depends(auth_user)):
+    if user.disable: raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid user")
+
+    return User(**user)
+
 @router.post("/signUp")
 async def sign_up(user: UserDB):
     if type(search_user("email", user.email)):
@@ -51,3 +66,7 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
     "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_DURATION)}
     return {"access_token": jwt.encode(access_token, SECRET, ALGORITHM),
     "token_type": "Bearer"}
+
+@router.get('/profile')
+async def me(user: User = Depends(current_user)):
+    return User(**user)
