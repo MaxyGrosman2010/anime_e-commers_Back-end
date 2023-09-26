@@ -68,5 +68,5 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
     "token_type": "Bearer"}
 
 @router.get('/profile')
-async def me(user: User = Depends(current_user)):
+async def profile(user: User = Depends(current_user)):
     return User(**user)

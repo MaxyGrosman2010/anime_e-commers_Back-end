@@ -8,6 +8,9 @@ class User(BaseModel):
     username: str
     age: int
     email: str
+    favorites: Optional[list] = None
+    bought: Optional[list] = None
+    expire_date_animes: Optional[list] = None
 
 class UserDB(User):
     password: str
